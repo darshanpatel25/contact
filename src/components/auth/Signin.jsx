@@ -2,14 +2,19 @@ import { useState } from "react";
 import Layout from "../layout/Layout";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/authContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
+    const [auth,setAuth]= useAuth()
 
     const [showPassword, setShowPassword] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,25 +24,31 @@ const LoginForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        
+        try {
             const res = await axios.post("http://localhost:5000/api/v1/user/login", formData);
-    
+            
             if (res.data.success) {
                 toast.success(res.data.message);
-    
-                // Store both user and token
-                const authData = {
+                setAuth({
+                    ...auth,
                     user: res.data.user,
                     token: res.data.token,
-                };
+                  });
+                  localStorage.setItem("auth", JSON.stringify(res.data));
+                  localStorage.setItem('token',res.data.token)
+                  setTimeout(() => {
+                    
+                      navigate("/");
+                  }, 1500);
     
-                localStorage.setItem("auth", JSON.stringify(authData));
-                setAuth(authData); // Update global state
-    
+               
             } else {
                 toast.error(res.data.message);
             }
-        
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error("Something went wrong!");
+        }
     };
 
     return (
