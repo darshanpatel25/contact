@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Layout from "./layout/Layout";
+import Layout from "../layout/Layout";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -18,23 +18,27 @@ const LoginForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const res = await axios.post("http://localhost:5000/api/v1/user/login", formData);
-
-        if (res.data.success == true) {
-
-            toast.success(res.data.message);
-            localStorage.setItem("token", res.data.token)
-        }
-        else {
-
-            toast.error(res.data.message);
-        }
-
-
-
+    
+        
+            const res = await axios.post("http://localhost:5000/api/v1/user/login", formData);
+    
+            if (res.data.success) {
+                toast.success(res.data.message);
+    
+                // Store both user and token
+                const authData = {
+                    user: res.data.user,
+                    token: res.data.token,
+                };
+    
+                localStorage.setItem("auth", JSON.stringify(authData));
+                setAuth(authData); // Update global state
+    
+            } else {
+                toast.error(res.data.message);
+            }
+        
     };
-
 
     return (
         <Layout>
