@@ -7,6 +7,8 @@ import AdminRoute from "./components/routes/AdminRoute";
 import PrivateRoute from "./components/routes/Private";
 import CreateUser from "./components/userManagement/CreateUser";
 import ManageUser from "./components/userManagement/ManageUser";
+import CreateTeam from "./components/teamManagement/CreateTeam";
+import ManageTeam from "./components/teamManagement/ManageTeam";
 
 function App() {
 
@@ -18,6 +20,8 @@ function App() {
       <Route path='/signup' element={<SignupForm/>}/>
       <Route path="/usermanagement/create" element={<CreateUser/>}/>
       <Route path="/usermanagement/manage" element={<ManageUser/>}/>
+      <Route path="/teammanagement/create" element={<CreateTeam/>}/>
+      <Route path="/teammanagement/manage" element={<ManageTeam/>}/>
     </Routes>
 
   )

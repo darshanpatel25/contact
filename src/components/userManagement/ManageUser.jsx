@@ -10,8 +10,17 @@ const ManageUser = () => {
     const [allUsers, setAllUsers] = useState()
 
     const getAllUsers = async () => {
-        const res = await axios.get("http://localhost:5000/api/v1/user/getusers")
+        const token = localStorage.getItem('token')
+        const auth = JSON.parse(localStorage.getItem('auth'))
+        const id = auth.user._id
+        const res = await axios.get("http://localhost:5000/api/v1/user/getusers", {
+            headers: {
+                "authtoken": token,
+                "id": id
+            }
+        })
         let users = res.data.users
+        console.log(res.data.users)
         setAllUsers(users)
 
     }
@@ -20,12 +29,22 @@ const ManageUser = () => {
     //     alert("Edits")
     // }
 
-    const handleDelete = async(userId)=>{
-        const res = axios.delete(`http://localhost:5000/api/v1/user/delete-user/${userId}`)
-        if( res.data.success==true){
+    const handleDelete = async (userId) => {
+        const token = localStorage.getItem('token')
+        const auth = JSON.parse(localStorage.getItem('auth'))
+        const id = auth.user._id
+        const res = await axios.delete(`http://localhost:5000/api/v1/user/delete-user/${userId}`,{
+            headers: {
+                "authtoken": token,
+                "id": id
+            }
+        })
+
+        if (res.data.success == true) {
+            window.location.reload()
             toast.success(res.data.message)
         }
-        else{
+        else {
             toast.error(res.data.message)
         }
     }
@@ -60,6 +79,10 @@ const ManageUser = () => {
                                             isAdmin
                                         </th>
                                         <th scope="col" class="px-6 py-3">
+                                            Team
+                                        </th>
+
+                                        <th scope="col" class="px-6 py-3">
                                             Action
                                         </th>
                                     </tr>
@@ -72,6 +95,7 @@ const ManageUser = () => {
                                             </th>
                                             <td className="px-6 py-4">{user.email}</td>
                                             <td className="px-6 py-4">{user.access ? "Admin" : "User"}</td>
+                                            <td className='px-6 py-4'>  {user.teams.length > 0 ? user.teams.map(team => team.name).join(', ') : 'No Team'}</td>
                                             <td className="px-6 py-4">
                                                 <a href="#" className="text-white bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-2">
 
