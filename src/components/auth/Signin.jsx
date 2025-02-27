@@ -33,15 +33,26 @@ const LoginForm = () => {
                     ...auth,
                     user: res.data.user,
                     token: res.data.token,
-                  });
-                  localStorage.setItem("auth", JSON.stringify(res.data));
-                  localStorage.setItem('token',res.data.token)
-                  setTimeout(() => {
-                    
-                      navigate("/");
-                  }, 1500);
+                });
     
-               
+                localStorage.setItem("auth", JSON.stringify(res.data));
+                localStorage.setItem("token", res.data.token);
+    
+                // ✅ Corrected API call
+                const userRes = await axios.get("http://localhost:5000/api/v1/user/me", {
+                    headers: { 
+                        "authtoken": res.data.token, // ✅ Fixed
+                        "id": res.data.user._id, // ✅ Fixed
+                    },
+                });
+    
+                if (userRes.data.success) {
+                    localStorage.setItem("permissions", JSON.stringify(userRes.data.user.permissions));
+                }
+    
+                setTimeout(() => {
+                    navigate("/dashboard");
+                }, 1500);
             } else {
                 toast.error(res.data.message);
             }
@@ -50,13 +61,14 @@ const LoginForm = () => {
             toast.error("Something went wrong!");
         }
     };
+    
 
     return (
         <Layout>
             <div className="max-w-md mx-auto bg-white p-6 rounded-2xl shadow-md mt-10 border border-gray-200">
                 <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Email */}
+                    
                     <div>
                         <label className="block text-gray-600">Email</label>
                         <input
@@ -70,7 +82,7 @@ const LoginForm = () => {
                         />
                     </div>
 
-                    {/* Password */}
+                    
                     <div>
                         <label className="block text-gray-600">Password</label>
                         <div className="relative">

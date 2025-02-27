@@ -4,8 +4,18 @@ import AdminMenu from '../layout/AdminMenu'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { usePermissions } from '../../context/PermissionContext'
 
 const ManageUser = () => {
+    const auth = JSON.parse(localStorage.getItem('auth'))
+    const admin = auth.user.access
+    if(admin !=1){
+        var permissions = localStorage.getItem("permissions")
+
+    }
+    else{
+        permissions = []
+    }
 
     const [allUsers, setAllUsers] = useState()
 
@@ -33,7 +43,7 @@ const ManageUser = () => {
         const token = localStorage.getItem('token')
         const auth = JSON.parse(localStorage.getItem('auth'))
         const id = auth.user._id
-        const res = await axios.delete(`http://localhost:5000/api/v1/user/delete-user/${userId}`,{
+        const res = await axios.delete(`http://localhost:5000/api/v1/user/delete-user/${userId}`, {
             headers: {
                 "authtoken": token,
                 "id": id
@@ -61,7 +71,7 @@ const ManageUser = () => {
                     <AdminMenu />
                 </div>
                 <div className="md:w-5/6 p-6">
-                    <div className='text-center text-3xl py-3 font-semibold'>Manage User</div>
+                    <div className='text-center text-3xl py-3 font-semibold'>Manage Users</div>
                     <div>
 
 
@@ -97,16 +107,18 @@ const ManageUser = () => {
                                             <td className="px-6 py-4">{user.access ? "Admin" : "User"}</td>
                                             <td className='px-6 py-4'>  {user.teams.length > 0 ? user.teams.map(team => team.name).join(', ') : 'No Team'}</td>
                                             <td className="px-6 py-4">
-                                                <a href="#" className="text-white bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-2">
+                                                {(admin || permissions.includes("update_user")) && <a href="#" className="text-white bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-2">
 
                                                     Edit
 
-                                                </a>
-                                                <a href="#" className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-2" onClick={() => handleDelete(user._id)}>
+                                                </a>}
+                                                {
+                                                    (admin || permissions.includes("delete_user")) && <a href="#" className="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center m-2" onClick={() => handleDelete(user._id)}>
 
-                                                    Delete
+                                                        Delete
 
-                                                </a>
+                                                    </a>
+                                                }
                                             </td>
                                         </tr>
                                     ))}
