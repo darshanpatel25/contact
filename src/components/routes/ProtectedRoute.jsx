@@ -8,7 +8,7 @@ const ProtectedRoute = ({ requiredPermissions, children }) => {
     console.error("🚨 Permissions are undefined! Check PermissionContext.");
     return <Navigate to="/unauthorized" />;
   }
-
+  
   const permissionList = Array.isArray(requiredPermissions) ? requiredPermissions : [requiredPermissions];
   const hasPermission = permissionList.some((perm) => permissions.includes(perm));
 

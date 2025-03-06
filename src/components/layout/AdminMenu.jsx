@@ -23,14 +23,14 @@ const AdminMenu = () => {
         >
           Create User
         </NavLink>}
-        <NavLink
+        {(admin || permissions.includes("read_user")) && <NavLink
           to="/usermanagement/manage"
           className={({ isActive }) =>
             `px-4 py-2 rounded-md text-gray-800 hover:bg-gray-200 transition ${isActive ? "bg-gray-300 font-semibold" : "bg-white"}`
           }
         >
           Manage Users
-        </NavLink>
+        </NavLink>}
         {(admin || permissions.includes("create_team")) && <NavLink
           to="/teammanagement/create"
           className={({ isActive }) =>
@@ -39,14 +39,14 @@ const AdminMenu = () => {
         >
           Create Team
         </NavLink>}
-        <NavLink
+        {(admin || permissions.includes("read_team"))&& <NavLink
           to="/teammanagement/manage"
           className={({ isActive }) =>
             `px-4 py-2 rounded-md text-gray-800 hover:bg-gray-200 transition ${isActive ? "bg-gray-300 font-semibold" : "bg-white"}`
           }
         >
           Manage Teams
-        </NavLink>
+        </NavLink>}
         {(admin || permissions.includes("create_contact")) && <NavLink
           to="/contactmanagement/create"
           className={({ isActive }) =>
@@ -55,14 +55,14 @@ const AdminMenu = () => {
         >
           Create Contact
         </NavLink>}
-        <NavLink
+        {(admin || permissions.includes("read_contact")) && <NavLink
           to="/contactmanagement/manage"
           className={({ isActive }) =>
             `px-4 py-2 rounded-md text-gray-800 hover:bg-gray-200 transition ${isActive ? "bg-gray-300 font-semibold" : "bg-white"}`
           }
         >
           Manage Contacts
-        </NavLink>
+        </NavLink>}
 
       </div>
     </div>

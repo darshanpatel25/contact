@@ -63,7 +63,7 @@ const CreateTeam = () => {
         toast.error(res.data.message);
       }
     } catch (error) {
-      toast.error("Error creating team");
+      toast.error("Something went wrong");
     }
   };
 

@@ -3,23 +3,23 @@ import Layout from '../layout/Layout';
 import AdminMenu from '../layout/AdminMenu';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { usePermissions } from '../../context/PermissionContext';
+
 
 const CreateUser = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        role: 0
+        access: 0
     });
-const permissions = usePermissions()
+
 
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevState => ({
             ...prevState,
-            [name]: name === 'role' ? (value === 'admin' ? 1 : 0) : value
+            [name]: value
         }));
     };
 
@@ -66,13 +66,7 @@ const permissions = usePermissions()
                                 <input type="password" name="password" id="password" className="block py-2.5 px-0 w-full text-sm text-slate-900 bg-transparent border-0 border-b-2 border-slate-500 focus:outline-none focus:ring-0 focus:border-blue-500 peer" placeholder=" " required onChange={handleChange} />
                                 <label htmlFor="password" className="absolute text-sm text-slate-600 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-500">Password</label>
                             </div>
-                            <div className="relative z-0 w-full mb-5 group">
-                                <select name="role" id="role" className="block py-2.5 px-0 w-full text-sm text-slate-900 bg-transparent border-0 border-b-2 border-slate-500 focus:outline-none focus:ring-0 focus:border-blue-500 peer" required onChange={handleChange}>
-                                    <option value="user">User</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                                <label htmlFor="role" className="absolute text-sm text-slate-600 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 peer-focus:text-blue-500">Role</label>
-                            </div>
+                          
                             <button type="submit" className="text-white bg-slate-600 hover:bg-slate-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">Submit</button>
                         </form>
                     </div>
