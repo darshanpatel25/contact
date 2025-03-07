@@ -47,6 +47,22 @@ const AdminMenu = () => {
         >
           Manage Teams
         </NavLink>}
+        {(admin || permissions.includes("create_role")) && <NavLink
+          to="/rolemanagement/create"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md text-gray-800 hover:bg-gray-200 transition ${isActive ? "bg-gray-300 font-semibold" : "bg-white"}`
+          }
+        >
+          Create Role
+        </NavLink>}
+        {(admin || permissions.includes("read_role"))&& <NavLink
+          to="/rolemanagement/manage"
+          className={({ isActive }) =>
+            `px-4 py-2 rounded-md text-gray-800 hover:bg-gray-200 transition ${isActive ? "bg-gray-300 font-semibold" : "bg-white"}`
+          }
+        >
+          Manage Role
+        </NavLink>}
         {(admin || permissions.includes("create_contact")) && <NavLink
           to="/contactmanagement/create"
           className={({ isActive }) =>

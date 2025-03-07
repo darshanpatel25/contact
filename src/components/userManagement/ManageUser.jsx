@@ -12,8 +12,11 @@ const ManageUser = () => {
     const [selectedTeam, setSelectedTeam] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const [teams, setTeams] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [isRoleModalOpen, setIsRoleModalOpen] = useState(false)
+    const [selectedRole, setSelectedRole] = useState('');
 
-    
+
     const auth = JSON.parse(localStorage.getItem('auth'));
     const admin = auth.user.access;
     const permissions = admin !== 1 ? localStorage.getItem("permissions") || [] : [];
@@ -44,11 +47,24 @@ const ManageUser = () => {
             const auth = JSON.parse(localStorage.getItem('auth'))
             const id = auth.user._id
             const res = await axios.get("http://localhost:5000/api/v1/team/getteams", {
-                headers: { "authtoken": token,"id":id }
+                headers: { "authtoken": token, "id": id }
             });
             setTeams(res.data.teams);
         } catch (error) {
             toast.error("Error fetching teams");
+        }
+    };
+    const fetchRoles = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const auth = JSON.parse(localStorage.getItem('auth'))
+            const id = auth.user._id
+            const res = await axios.get("http://localhost:5000/api/v1/role/get", {
+                headers: { "authtoken": token, "id": id }
+            });
+            setRoles(res.data.roles);
+        } catch (error) {
+            toast.error("Error fetching Roles");
         }
     };
 
@@ -72,7 +88,7 @@ const ManageUser = () => {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            const auth  =JSON.parse(localStorage.getItem('auth'))
+            const auth = JSON.parse(localStorage.getItem('auth'))
             const id = auth.user._id
             const res = await axios.put(`http://localhost:5000/api/v1/user/update-user/${editUser._id}`, editUser, {
                 headers: { "authtoken": token, "id": id }
@@ -93,11 +109,16 @@ const ManageUser = () => {
         setSelectedUser(user);
         setIsTeamModalOpen(true);
     };
-    
-    
+    const handleRoleAssign = (user) => {
+        setSelectedUser(user);
+        setIsRoleModalOpen(true);
+    };
+
+
     useEffect(() => {
         fetchUsers();
-        fetchTeams(); 
+        fetchTeams();
+        fetchRoles();
     }, []);
 
     const assignTeam = async () => {
@@ -107,7 +128,7 @@ const ManageUser = () => {
                 userId: selectedUser._id,
                 teamId: selectedTeam
             }, {
-                headers: { "authtoken": token,"id":auth.user._id}
+                headers: { "authtoken": token, "id": auth.user._id }
             });
             if (res.data.success) {
                 toast.success("Team assigned successfully");
@@ -118,6 +139,26 @@ const ManageUser = () => {
             }
         } catch (error) {
             toast.error("Error assigning team");
+        }
+    };
+    const assignRole = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.post("http://localhost:5000/api/v1/user/assign-role", {
+                userId: selectedUser._id,
+                roleId: selectedRole
+            }, {
+                headers: { "authtoken": token, "id": auth.user._id }
+            });
+            if (res.data.success) {
+                toast.success("Role assigned successfully");
+                setIsRoleModalOpen(false);
+                fetchUsers();
+            } else {
+                toast.error(res.data.message);
+            }
+        } catch (error) {
+            toast.error("Error assigning Role");
         }
     };
 
@@ -143,16 +184,24 @@ const ManageUser = () => {
                             <tbody>
                                 {allUsers?.map(user => (
                                     <tr key={user._id} className="border-b">
-                                        <td className="px-6 py-4">{user.name}</td>
-                                        <td className="px-6 py-4">{user.email}</td>
-                                        <td className="px-6 py-4 ">{user.access ? "Admin" : "User"}</td>
-                                        <td className='px-6 py-4 '>  {user.teams.length > 0 ? user.teams.map(team => team.name).join(', ') : 'No Team'}</td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-4">{user.name}</td>
+                                        <td className="px-2 py-4">{user.email}</td>
+                                        <td className='px-2 py-4 '>
+                                            {user.roles.length > 0 ? user.roles.join(', ') : 'No Role'}
+                                        </td>
+                                        <td className='px-2 py-4 '>
+                                            {user.teams.length > 0 ? user.teams.join(', ') : 'No Team'}
+                                        </td>
+
+                                        <td className="px-2 py-4">
                                             {(admin || permissions.includes("update_user")) && (
                                                 <button className="text-white bg-slate-600 hover:bg-slate-700 rounded-lg text-sm px-5 py-2.5 m-2" onClick={() => handleEdit(user)}>Edit</button>
                                             )}
                                             {(admin || permissions.includes("update_user")) && (
                                                 <button className="text-white bg-slate-600 hover:bg-slate-700 rounded-lg text-sm px-5 py-2.5 m-2" onClick={() => handleTeamAssign(user)}>Assign Team</button>
+                                            )}
+                                            {(admin || permissions.includes("update_user")) && (
+                                                <button className="text-white bg-slate-600 hover:bg-slate-700 rounded-lg text-sm px-5 py-2.5 m-2" onClick={() => handleRoleAssign(user)}>Assign Role</button>
                                             )}
                                             {(admin || permissions.includes("delete_user")) && (
                                                 <button className="text-white bg-red-600 hover:bg-red-700 rounded-lg text-sm px-5 py-2.5 m-2" onClick={() => handleDelete(user._id)}>Delete</button>
@@ -170,7 +219,7 @@ const ManageUser = () => {
                     <div className="bg-white p-6 rounded-lg w-96">
                         <h2 className="text-xl mb-4">Edit User</h2>
                         <input type="text" name="name" value={editUser.name} onChange={(e) => setEditUser({ ...editUser, name: e.target.value })} className="w-full mb-2 p-2 border" />
-                        <input type="password" name="email" onChange={(e) => setEditUser({ ...editUser, password: e.target.value })} className="w-full mb-2 p-2 border" placeholder='Enter Password if you want to change'/>
+                        <input type="password" name="email" onChange={(e) => setEditUser({ ...editUser, password: e.target.value })} className="w-full mb-2 p-2 border" placeholder='Enter Password if you want to change' />
                         <div className="flex justify-end">
                             <button className="bg-green-600 text-white px-4 py-2 mr-2 rounded" onClick={handleSave}>Update</button>
                             <button className="bg-gray-600 text-white px-4 py-2 rounded" onClick={() => setIsModalOpen(false)}>Cancel</button>
@@ -178,7 +227,7 @@ const ManageUser = () => {
                     </div>
                 </div>
             )}
-             {isTeamModalOpen && (
+            {isTeamModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg w-96">
                         <h2 className="text-xl mb-4">Assign Team to {selectedUser?.name}</h2>
@@ -191,6 +240,24 @@ const ManageUser = () => {
                         <div className="flex justify-end">
                             <button className="bg-green-600 text-white px-4 py-2 mr-2 rounded" onClick={assignTeam}>Assign</button>
                             <button className="bg-gray-600 text-white px-4 py-2 rounded" onClick={() => setIsTeamModalOpen(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isRoleModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg w-96">
+                        <h2 className="text-xl mb-4">Assign Role to {selectedUser?.name}</h2>
+                        <select className="w-full mb-2 p-2 border" onChange={(e) => setSelectedRole(e.target.value)}>
+                            <option value="">Select a Role</option>
+                            {roles?.map(role => (
+                                <option key={role._id} value={role._id}>{role.name}</option>
+                            ))}
+
+                        </select>
+                        <div className="flex justify-end">
+                            <button className="bg-green-600 text-white px-4 py-2 mr-2 rounded" onClick={assignRole}>Assign</button>
+                            <button className="bg-gray-600 text-white px-4 py-2 rounded" onClick={() => setIsRoleModalOpen(false)}>Cancel</button>
                         </div>
                     </div>
                 </div>

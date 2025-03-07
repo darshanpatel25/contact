@@ -15,6 +15,8 @@ import ViewContact from "./components/contactManagement/ViewContact";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import Unauthorized from "./components/Unauthorized";
 import Dashboard from "./components/Dashboard";
+import CreateRole from "./components/roleManagement/CreateRole";
+import ManageRole from "./components/roleManagement/ManageRole";
 
 function App() {
 
@@ -32,6 +34,8 @@ function App() {
       <Route path="/contactmanagement/manage" element={<ManageContact />} />
       <Route path="/contactmanagement/view/:id" element={<ViewContact />} />
       <Route path="/dashboard" element={<Dashboard/>}/>
+      <Route path="/rolemanagement/create" element={<CreateRole/>}/>
+      <Route path="/rolemanagement/manage" element={<ManageRole/>}/>
 
       {/* <Route
         path="/usermanagement/create"
